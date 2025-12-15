@@ -1,0 +1,98 @@
+using UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
+using TMPro;
+public class GoalManager : MonoBehaviour
+{
+    [Header("Game Objects")]
+    public Transform playerLeft;
+    public Transform playerRight;
+    public Transform ball;
+
+    [Header("Score UI")]
+    public TMP_Text scoreboardText;
+
+    [Header("Reset Settings")]
+    public float resetDelay = 3f;
+
+    [Header("Score Flash Effect")]
+    public float scoreFlashDuration = 0.3f;
+    public Color flashColor = Color.yellow;
+
+    private Vector3 playerLeftStartPos;
+    private Vector3 playerRightStartPos;
+    private Vector3 ballStartPos;
+
+    private int scorePlayerLeft = 0;
+    private int scorePlayerRight = 0;
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {   
+        playerLeftStartPos= playerLeft.position;
+        playerRightStartPos= playerRight.position;
+        ballStartPos=ball.position;
+
+        UpdateScoreboard();
+        
+    }
+
+    public void OnGoalScored(bool playerLeftGoal)
+    {
+        StartCoroutine(HandleGoal(playerLeftGoal));
+    }
+
+    private IEnumerator HandleGoal(bool playerLeftGoal)
+    {
+        yield return new WaitForSeconds(resetDelay);
+
+        if (playerLeftGoal)
+        {
+            scorePlayerRight++;
+        }
+        else
+        {
+            scorePlayerLeft++;
+        }
+        UpdateScoreboard();
+
+        //Pozisyon resetleme
+        playerLeft.position = playerLeftStartPos;
+        playerRight.position = playerRightStartPos;
+        ball.position = ballStartPos;
+
+        //E�er top Rigidbody2D ile hareket ettiriyosa durdur
+        Rigidbody2D rb= ball.GetComponent<Rigidbody2D>();
+        if(rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
+    }
+    private void UpdateScoreboard()
+    {
+        if (scoreboardText != null)
+        {
+            scoreboardText.text = scorePlayerLeft + ":" + scorePlayerRight;
+            StartCoroutine(FlashScore());
+        }
+    }
+
+    private IEnumerator FlashScore()
+    {
+        Color original=scoreboardText.color;
+        scoreboardText.color =flashColor;
+        yield return new WaitForSeconds(scoreFlashDuration);
+        scoreboardText.color = original;
+    }
+
+    public int GetLeftScore()
+    {
+        return scorePlayerLeft;
+    }
+
+    public int GetRightScore()
+    {
+        return scorePlayerRight;
+    }
+}
