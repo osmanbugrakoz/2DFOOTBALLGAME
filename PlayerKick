@@ -1,0 +1,33 @@
+using UnityEngine;
+
+public class PlayerKick : MonoBehaviour
+{
+    public bool isPlayer1 = true;
+    public Animator footAnimator;
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
+        footAnimator = GetComponentInChildren<Animator>();
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (isPlayer1)
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                footAnimator.SetTrigger("Kick");
+            }
+        }
+        else 
+        {
+            if (Input.GetKeyDown(KeyCode.Period))
+            {
+                footAnimator.SetTrigger("Kick");
+            }
+        }
+
+    }
+}
